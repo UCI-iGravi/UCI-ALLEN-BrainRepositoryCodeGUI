@@ -19,16 +19,16 @@ from shutil import move, copymode
 from os import fdopen, remove
 from cellAnalysis.cell_counting import *
 from cellAnalysis.cell_detection import *
-from reconstruction import *
+from registration.reconstruction import *
 import registration as rg
 import shutil
 from tqdm import tqdm
 import time
 import matplotlib.pyplot as plt
 from scipy.ndimage import affine_transform, geometric_transform
-from registration.reconstruction import create_nifti_image
+#from registration.reconstruction import create_nifti_image
 from registration.reg_utils import loadNiiImages
-import registration as rg
+#import registration as rg
 
 
 
