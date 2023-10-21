@@ -97,6 +97,8 @@ def main():
         print(len(fns))
         if args.out_dir == "":
             out_dir = img_dir
+        else:
+            out_dir = args.out_dir
         if not os.path.isdir(out_dir):
             os.mkdir(out_dir)
 
