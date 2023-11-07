@@ -374,8 +374,8 @@ if __name__ == '__main__':
             annotationImage  = sitk.ReadImage(os.path.join(output_dir,"result.nii"))
             """
         else:
-            #mapping = loadTransformMapping(fData.shape, mData.shape, output_dir)
-            #np.save("mapping.npy", mapping)
+            mapping = loadTransformMapping(fData.shape, mData.shape, output_dir)
+            np.save("mapping.npy", mapping)
             mapping=np.load("mapping.npy")
             outputIndices = getMappedIndices(scaledCellLocations, mapping)
 
