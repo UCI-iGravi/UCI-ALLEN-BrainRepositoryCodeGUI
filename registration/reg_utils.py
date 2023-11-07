@@ -39,7 +39,10 @@ from registration.vol2affine import vol2affine
 from registration.align_utils import align_rotation
 from registration.reconstruction import create_nifti_image
 
-ELASTIXDIR = "./elastix/"
+if os.name == 'nt':
+    ELASTIXDIR = "./elastix/"
+elif os.name == 'posix':
+    ELASTIXDIR = "./elastix/bin/"
 
 def loadNiiImages(imageList, scale = False):
     """
