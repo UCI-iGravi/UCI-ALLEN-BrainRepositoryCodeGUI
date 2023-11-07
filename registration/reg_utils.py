@@ -7,6 +7,7 @@ Code developed at UC Irvine.
 Implemented various functions that serve as building blocks in the registration pipeline
 """
 import os
+import sys
 import subprocess
 import gc
 import time
@@ -39,10 +40,13 @@ from registration.vol2affine import vol2affine
 from registration.align_utils import align_rotation
 from registration.reconstruction import create_nifti_image
 
-if os.name == 'nt':
+# Windows 
+if sys.platform == 'win32':
     ELASTIXDIR = "./elastix/"
-elif os.name == 'posix':
+# Linux
+elif sys.platform == 'linux':
     ELASTIXDIR = "./elastix/bin/"
+
 
 def loadNiiImages(imageList, scale = False):
     """
