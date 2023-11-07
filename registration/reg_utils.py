@@ -202,7 +202,9 @@ def elastixRegistration(fixedImagePath, movingImagePath, outputDir, rescale=True
     if elastixDir is None:
         elastixDir=ELASTIXDIR
 
-    registration_cmd = [elastixDir+"elastix","-f",fixedImagePath, "-m", movingImagePath, "-out", outputDir, "-p" , "001_parameters_Rigid.txt", "-p", "002_parameters_BSpline.txt"]
+    registration_cmd = [elastixDir + "elastix", "-f", fixedImagePath, "-m", movingImagePath, "-out", outputDir, "-p" , "001_parameters_Rigid.txt", "-p", "002_parameters_BSpline.txt"]
+    if sys.platform == 'linux':
+        registration_cmd.insert(0, "sudo")
     subprocess.run(registration_cmd)
     return os.path.join(outputDir, "result.1.nii")
 
@@ -224,7 +226,10 @@ def elastixTransformation(imagePath, regDir, outDir=None, elastixDir=None):
 
     if elastixDir is None:
         elastixDir=ELASTIXDIR
-    transformix_cmd = [elastixDir+"transformix","-in",imagePath,"-out", outDir,"-tp",os.path.join(regDir,"TransformParameters.1.txt")]
+
+    transformix_cmd = [elastixDir + "transformix", "-in", imagePath, "-out", outDir, "-tp", os.path.join(regDir,"TransformParameters.1.txt")]
+    if sys.platform == 'linux':
+        transformix_cmd.insert(0, "sudo")
     subprocess.run(transformix_cmd)
     return outPath
 
