@@ -11,6 +11,7 @@ import numpy as np
 import subprocess
 import argparse 
 import os
+import sys
 import nibabel as nib
 from collections import Counter
 import pandas as pd
@@ -26,10 +27,7 @@ from tqdm import tqdm
 import time
 import matplotlib.pyplot as plt
 from scipy.ndimage import affine_transform, geometric_transform
-#from registration.reconstruction import create_nifti_image
 from registration.reg_utils import loadNiiImages
-#import registration as rg
-
 
 
 def get_input_cell_locations(input_mat):
@@ -339,7 +337,11 @@ if __name__ == '__main__':
                 cell_locations[:,1] = mData.shape[1] - cell_locations[:,1]-1
                 cell_locations[:,2] = mData.shape[2] - cell_locations[:,2]-1
             else:
-                imgfiles = natsorted(glob.glob(img_dir+"/**/*1_{}.tif".format(channel), recursive=True))
+                # Temporary image path solution for kiwi server
+                if sys.platform == 'linux':
+                    imgfiles = natsorted(glob.glob(img_dir + "/*-{}.tif".format(channel), recursive=True))
+                else:
+                    imgfiles = natsorted(glob.glob(img_dir + "/**/*1_{}.tif".format(channel), recursive=True))
                 
                 cells = Parallel(n_jobs=-4, verbose=13)(delayed(get_cell_locations)(img_file, index =i, intensity_threshold=threshold) for i, img_file in enumerate(imgfiles))
                 cell_locations = np.vstack(cells)
