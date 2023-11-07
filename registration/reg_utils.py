@@ -43,10 +43,9 @@ from registration.reconstruction import create_nifti_image
 # Windows 
 if sys.platform == 'win32':
     ELASTIXDIR = "./elastix/"
-# Linux
+# Linux (kiwi)
 elif sys.platform == 'linux':
-    ELASTIXDIR = "./elastix/bin/"
-
+    ELASTIXDIR = "/workspace/texera/core/amber/user-resources/files/40/elastix/bin/"
 
 def loadNiiImages(imageList, scale = False):
     """
