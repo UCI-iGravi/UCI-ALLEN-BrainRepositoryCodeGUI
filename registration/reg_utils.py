@@ -506,11 +506,11 @@ def applyDeformationField(image, deformationField):
     return transformedData
 
 def get_correspondences( sourcep,sourcen, targetn, kdtree, degree_thresh =5, distance_neighbours=500, dthresh = 5):
-    if type(kdtree) == open3d.cpu.pybind.geometry.KDTreeFlann:
+    if type(kdtree).__name__ == 'KDTreeFlann' or type(kdtree) == open3d.cpu.pybind.geometry.KDTreeFlann:
         [k, indices, _] = kdtree.search_knn_vector_3d(sourcep, distance_neighbours)
         target_npc = targetn[indices]
-    elif type(kdtree) == scipy.spatial._kdtree.KDTree:
-        d,indices =kdtree.query(sourcep, distance_neighbours)
+    elif type(kdtree).__name__ == 'KDTree' or type(kdtree) == scipy.spatial._kdtree.KDTree:
+        d,indices = kdtree.query(sourcep, distance_neighbours)
         indices = indices[np.where(d<np.percentile(d,90))[0]]
         target_npc = targetn[indices]
     
