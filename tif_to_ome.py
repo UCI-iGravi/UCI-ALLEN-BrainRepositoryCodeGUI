@@ -93,7 +93,11 @@ def main():
         """
         List of image files that needs to be stacked.
         """
-        fns = natsorted(glob.glob(args.img_dir+"/**/*1_{}.tif".format(channel), recursive=True))
+        # Temporary solution for kiwi1 linux server
+        if sys.platform == 'linux':
+            fns = natsorted(glob.glob(args.img_dir + "/*-{}.tif".format(channel), recursive=True))
+        else:
+            fns = natsorted(glob.glob(args.img_dir + "/**/*1_{}.tif".format(channel), recursive=True))
         print(len(fns))
         if args.out_dir == "":
             out_dir = img_dir
