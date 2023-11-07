@@ -101,7 +101,12 @@ def createNiiImages(img_dir, out_dir , channel=0):
     if out_dir == None:
         out_dir = os.path.join(img_dir,"nii" )
 
-    fns = natsorted(glob.glob(img_dir+"/**/*1_{}.tif".format(channel), recursive=True))
+    # Temporary solution for kiwi linux server
+    if sys.platform == 'linux':
+        fns = natsorted(glob.glob(img_dir + "/*-{}.tif".format(channel), recursive=True))
+    else:
+        fns = natsorted(glob.glob(img_dir + "/**/*1_{}.tif".format(channel), recursive=True))
+        
     if not os.path.isdir(out_dir):
         os.mkdir(out_dir)
 
