@@ -88,6 +88,7 @@ def readTifSection( file_path):
 def main():
     try:
         args = arg_parser().parse_args()
+        print(args)
         img_dir = Path(args.img_dir)
         channel = args.channel
         """
@@ -105,7 +106,7 @@ def main():
             out_dir = args.out_dir
         if not os.path.isdir(out_dir):
             os.mkdir(out_dir)
-
+            
         """
         Path to zarr group
         """

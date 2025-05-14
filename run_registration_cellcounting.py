@@ -30,6 +30,7 @@ from scipy.ndimage import affine_transform, geometric_transform
 from registration.reg_utils import loadNiiImages
 
 
+
 def get_input_cell_locations(input_mat):
     mat = scipy.io.loadmat(input_mat)
     location_arr  = mat['location'][0]
@@ -138,8 +139,11 @@ def loadTransformMapping(fshape, mshape,regDir):
     Y =Y.astype(float)
     Z= Z.astype(float)
     
-    
-    A = np.load(os.path.join(regDir,"axisAlignA.npy"))
+    try:
+        A = np.load(os.path.join(regDir,"axisAlignA.npy"))
+    except:
+        print("Warning: axisAlignA.npy does not exist. Using identity matrix.")
+        A = np.eye(4)
     alignedX = affine_transform(X,np.linalg.inv(A), output_shape = X.shape, order =1)
     alignedY = affine_transform(Y,np.linalg.inv(A), output_shape = Y.shape, order =1)
     alignedZ = affine_transform(Z,np.linalg.inv(A), output_shape = Z.shape, order =1)
@@ -208,19 +212,27 @@ def registration(fixedImagePath, movingImagePath, outputDir):
     """
     Wrapper around different steps involved in Registration. 
     """
-    print("Aligning Axes")
-    A, axisAlignedData = rg.axisAlignData(fixedImagePath, movingImagePath)
-    np.save(os.path.join(outputDir,"axisAlignA.npy"), A)
-    axisAlignedDataPath  = os.path.join(outputDir , "axisAlignedData.nii.gz")
-    create_nifti_image(axisAlignedData, 2.5, axisAlignedDataPath, 1)
-    movingImagePath = axisAlignedDataPath
+    print("Aligning axes...")
+    try:
+        A, axisAlignedData = rg.axisAlignData(fixedImagePath, movingImagePath)
+        np.save(os.path.join(outputDir,"axisAlignA.npy"), A)
+        axisAlignedDataPath  = os.path.join(outputDir , "axisAlignedData.nii.gz")
+        create_nifti_image(axisAlignedData, 2.5, axisAlignedDataPath, 1)
+        movingImagePath = axisAlignedDataPath
+    except Exception as e:
+        print("Warning: could not align axes.")
+        print(e)
+        axisAlignedData = nib.load(movingImagePath).get_fdata()
+        axisAlignedDataPath  = os.path.join(outputDir , "axisAlignedData.nii.gz")
+        create_nifti_image(axisAlignedData, 2.5, axisAlignedDataPath, 1)
+        axisAlignedDataPath = movingImagePath
 
-    print("Elastix Registration")
+    print("Running Elastix registration...")
     elastixResult  = rg.elastixRegistration(fixedImagePath , movingImagePath, outputDir, rescale=True)
     elastixResult  = rg.elastixTransformation(axisAlignedDataPath, outputDir)
     movingImagePath = elastixResult
 
-    print("Laplacian Refinement")
+    print("Running Laplacian refinement...")
     deformationField  = rg.sliceToSlice3DLaplacian(fixedImagePath , movingImagePath , axis =0 )
     np.save(os.path.join(outputDir,"deformation3d.npy"), deformationField)
     transformedData   = rg.applyDeformationField(movingImagePath , deformationField)
@@ -323,7 +335,7 @@ if __name__ == '__main__':
         else:
             registration(fixed_image, moving_image, output_dir)
 
-        print("Registrattion Done in {}".format(time.time()- start))
+        print("Registration Done in {}".format(time.time()- start))
     else:
         print("Skipping Registration. registration directory already present.")
 
@@ -376,8 +388,8 @@ if __name__ == '__main__':
             annotationImage  = sitk.ReadImage(os.path.join(output_dir,"result.nii"))
             """
         else:
-            mapping = loadTransformMapping(fData.shape, mData.shape, output_dir)
-            np.save("mapping.npy", mapping)
+            #mapping = loadTransformMapping(fData.shape, mData.shape, output_dir)
+            #np.save("mapping.npy", mapping)
             mapping=np.load("mapping.npy")
             outputIndices = getMappedIndices(scaledCellLocations, mapping)
 

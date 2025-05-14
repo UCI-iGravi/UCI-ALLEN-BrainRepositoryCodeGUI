@@ -35,7 +35,7 @@ def arg_parser():
                         help='path to tiff image directory')
     parser.add_argument('out_dir', type=str,
                         help='path to output the corresponding tif image slices')
-    parser.add_argument('--channel', type=int, default =1,
+    parser.add_argument('--channel', type=int, default =0,
                         help='Channel to generate nii file. 0 is default signal channel.')
     return parser
 
