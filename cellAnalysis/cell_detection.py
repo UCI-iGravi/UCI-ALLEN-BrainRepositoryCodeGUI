@@ -61,21 +61,21 @@ def createShardedPointAnnotation(points, output_directory ):
     """
     points: List of points to write into Annotation layer
     output_directory: Output Directory to write the sharded annotation
-
     """
+    
     output_directory = output_directory if isinstance(output_directory, os.PathLike) else Path(output_directory)
-    points_directory = output_directory/"points"
+    points_directory = output_directory/"neuroglancer_sharded_annotations"
     info = {
         "@type": "neuroglancer_annotations_v1",
         "annotation_type": "POINT",
         "by_id": { "key": "by_id" },
         "dimensions": {
-            "z": [50,"m"],
-            "x": [1.25,"m"],
-            "y": [1.25,"m"]
+            "z": [50, "m"],
+            "x": [1.25, "m"],
+            "y": [1.25, "m"]
         },
-        "lower_bound": [0,0,0],
-        "upper_bound": [300, 12000,8000],
+        "lower_bound": [0, 0, 0],
+        "upper_bound": [300, 12000, 8000],
         "properties": [],
         "relationships": [],
         "spatial": [
@@ -83,7 +83,7 @@ def createShardedPointAnnotation(points, output_directory ):
                 "chunk_size": (points.max(0) + 1).astype(int).tolist(),
                 "grid_shape": [1, 1, 1],
                 "key": "spatial0",
-                "limit": len(points)+1
+                "limit": len(points) + 1
             }
         ]
     }
