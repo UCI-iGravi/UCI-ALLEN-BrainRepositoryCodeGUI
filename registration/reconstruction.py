@@ -106,7 +106,7 @@ def createNiiImages(img_dir, out_dir , channel=0):
         fns = natsorted(glob.glob(img_dir + "/*-{}.tif".format(channel), recursive=True))
     else:
         fns = natsorted(glob.glob(img_dir + "/**/*1_{}.tif".format(channel), recursive=True))
-        
+    
     if not os.path.isdir(out_dir):
         os.mkdir(out_dir)
 

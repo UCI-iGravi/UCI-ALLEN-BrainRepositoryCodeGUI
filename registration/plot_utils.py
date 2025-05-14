@@ -80,14 +80,34 @@ def plot2DCorrespondences(dataImage, templateImage, title=None, nheight =1):
     mx_lines,my_lines,mz_lines = get_lines(mpoints,5* mnormals)
     fx_lines,fy_lines, fz_lines = get_lines(fpoints,5* fnormals)
 
-    fig = go.Figure(data=[go.Scatter3d(x=mpoints[:,0], y=mpoints[:,1], z=mpoints[:,2],mode='markers', name = "Moving Image")])
+    fig = go.Figure(data=[go.Scatter3d(x=mpoints[:,0], 
+                                       y=mpoints[:,1], 
+                                       z=mpoints[:,2],
+                                       mode='markers', 
+                                       name = "Moving Image")])
 
-    fig.add_trace(go.Scatter3d(x=fpoints[:,0], y=fpoints[:,1], z=fpoints[:,2],mode='markers', name = "Fixed Image"))
+    fig.add_trace(go.Scatter3d(x=fpoints[:,0], 
+                               y=fpoints[:,1], 
+                               z=fpoints[:,2],
+                               mode='markers', 
+                               name = "Fixed Image"))
 
-    fig.add_trace(go.Scatter3d(x=cx_lines,y=cy_lines,z=cz_lines,mode='lines',name = "Corrspondences"))
+    fig.add_trace(go.Scatter3d(x=cx_lines,
+                               y=cy_lines,
+                               z=cz_lines,
+                               mode='lines',
+                               name = "Correspondences"))
 
-    fig.add_trace(go.Scatter3d(x=mx_lines,y=my_lines,z=mz_lines,mode='lines',name ="Moving Image Normals"))
-    fig.add_trace(go.Scatter3d(x=fx_lines,y=fy_lines,z=fz_lines,mode='lines',name ="Fixed Image Normals"))
+    fig.add_trace(go.Scatter3d(x=mx_lines,
+                               y=my_lines,
+                               z=mz_lines,
+                               mode='lines',
+                               name ="Moving Image Normals"))
+    fig.add_trace(go.Scatter3d(x=fx_lines,
+                               y=fy_lines,
+                               z=fz_lines,
+                               mode='lines',
+                               name ="Fixed Image Normals"))
     if title is None:
         title="2D Corrspondences"
 
@@ -99,6 +119,17 @@ def plot2DCorrespondences(dataImage, templateImage, title=None, nheight =1):
         'x':0.5,
         'xanchor': 'center',
         'yanchor': 'top'}, autosize=True) 
+
+    fig.update_layout(scene=dict(xaxis=dict(showbackground=False, visible=False,
+                                            showgrid=False),
+                                 yaxis=dict(showbackground=False, visible=False),
+                                 zaxis=dict(showbackground=False, visible=False),
+                                 bgcolor='black'),
+                                 plot_bgcolor='rgb(0,0,0)',)
+    
+    fig.update_traces(marker=dict(size=2),
+                      selector=dict(mode='markers'))
+    
     fig.show(renderer='browser')
     return fedge, medge
 

@@ -40,12 +40,14 @@ from registration.vol2affine import vol2affine
 from registration.align_utils import align_rotation
 from registration.reconstruction import create_nifti_image
 
-# Windows 
+
+# Windows
 if sys.platform == 'win32':
     ELASTIXDIR = "./elastix/"
-# Linux (kiwi)
+# Linux
 elif sys.platform == 'linux':
     ELASTIXDIR = "/workspace/texera/core/amber/user-resources/files/40/elastix/bin/"
+
 
 def loadNiiImages(imageList, scale = False):
     """
@@ -199,7 +201,7 @@ def elastixRegistration(fixedImagePath, movingImagePath, outputDir, rescale=True
         movingImagePath = rescaledDataPath
 
     if elastixDir is None:
-        elastixDir=ELASTIXDIR
+        elastixDir = ELASTIXDIR
 
     registration_cmd = [elastixDir + "elastix", "-f", fixedImagePath, "-m", movingImagePath, "-out", outputDir, "-p" , "001_parameters_Rigid.txt", "-p", "002_parameters_BSpline.txt"]
     if sys.platform == 'linux':
@@ -224,9 +226,8 @@ def elastixTransformation(imagePath, regDir, outDir=None, elastixDir=None):
     outPath = os.path.join(outDir, "result.nii")
 
     if elastixDir is None:
-        elastixDir=ELASTIXDIR
-
-    transformix_cmd = [elastixDir + "transformix", "-in", imagePath, "-out", outDir, "-tp", os.path.join(regDir,"TransformParameters.1.txt")]
+        elastixDir = ELASTIXDIR
+    transformix_cmd = [elastixDir + "transformix", "-in", imagePath, "-out", outDir,"-tp", os.path.join(regDir,"TransformParameters.1.txt")]
     if sys.platform == 'linux':
         transformix_cmd.insert(0, "sudo")
     subprocess.run(transformix_cmd)
@@ -437,26 +438,38 @@ def sliceToSlice3DLaplacian(fixedImage , movingImage ,sliceMatchList="same", axi
     fpoints = np.concatenate(flist)
     mpoints = np.concatenate(mlist)
 
+    #fpoints = np.load("output/corrected_350pts_only2/fpts_350_2.npy")
+    #mpoints = np.load("output/corrected_350pts_only2/mpts_350_2.npy")
+
     fIndices = fpoints[:,0]* ny*nz + fpoints[:,1]*nz +fpoints[:,2]
     fIndices = fIndices.astype(int)
     
+    Xcount[fIndices] += 1 # AT added
     Ycount[fIndices] +=1
     Zcount[fIndices] +=1
+    Xd[fIndices] += mpoints[:,0] - fpoints[:,0]  # AT added
     Yd[fIndices] += mpoints[:,1] - fpoints[:,1]
     Zd[fIndices] += mpoints[:,2] - fpoints[:,2]
     
+    #print("Saving moving and fixed points")
+    #np.save("mpoints.npy", mpoints)
+    #np.save("fpoints.npy", fpoints)
     
     start = time.time()
     A = laplacianA3D(fdata.shape, Ycount.nonzero()[0])
 
+    #dx = lgmres(A, Xd , tol =1e-2)[0]  # AT added
+    #print("dz calculated in {}s".format(time.time()- start))  # AT added
+
     dy = lgmres(A, Yd , tol =1e-2)[0]
-    print("dx calculated in {}s".format(time.time()- start))
+    print("dy calculated in {}s".format(time.time()- start))
 
 
     dz = lgmres(A, Zd, tol =1e-2)[0]
-    print("dz calculated in {}s".format(time.time()- start))
+    print("dx calculated in {}s".format(time.time()- start))
 
-    deformationField[0] = np.zeros(fdata.shape)
+    deformationField[0] = np.zeros(fdata.shape)  # Original
+    #deformationField[0] = dx.reshape(fdata.shape)  # AT added
     deformationField[1] = dy.reshape(fdata.shape)
     deformationField[2] = dz.reshape(fdata.shape)
     
