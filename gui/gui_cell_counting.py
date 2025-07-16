@@ -228,7 +228,8 @@ class CountingTab(QWidget):
         self.count_button = QPushButton("Count cells")
         self.count_button.setMinimumSize(100, 50)  # Adjust the size as needed
         self.count_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.count_button.clicked.connect(self._thread_count_cells)
+        #self.count_button.clicked.connect(self._thread_count_cells)
+        self.count_button.clicked.connect(self._count_cells)
         self.count_button.setEnabled(False)  # Initially disabled
         
         ################### SETUP UI LAYOUT ###################
@@ -457,21 +458,27 @@ class CountingTab(QWidget):
         intensity_threshold = self.cell_intensity_thresh_spinbox.value()  # Intensity threshold for cell detection
         size_threshold = self.min_cell_size_spinbox.value()  # Minimum cell size for cell detection (try 25 as default)
         channel = self.channel_spinbox.value()  # Channel to detect cells from
+        
 
         # Background removal
         bg_thresh = self.bg_thresh_spinbox.value()
         y = self.y_shape
-        x = self.x_shape
+        x = self.x_shape    
         min_size = self.processing_min_size_spinbox.value()  # Largest allowable size for specks
+    
+        # Test
         area_thresh = self.processing_area_thresh_spinbox.value()  # Fill in holes smaller than this size
         dilation_iter = self.processing_dilation_iter_spinbox.value()  # 20
+        min_dist = self.processing_min_dist_spinbox.value()
 
         # Temporary image path solution for kiwi server
         if sys.platform == 'linux':
             imgfiles = natsorted(glob.glob(img_dir + "/*-{}.tif".format(channel), recursive=True))
         else:
             imgfiles = natsorted(glob.glob(img_dir + "/**/*1_{}.tif".format(channel), recursive=True))
-
+        #imgfiles = natsorted(glob.glob(img_dir + "/*.tif"))
+        #print("image files:")
+        #print(imgfiles)
         # Detect cells for all sections
         start = time.time()
         cells = []
@@ -481,7 +488,7 @@ class CountingTab(QWidget):
             image[image < 0] = 0
             c = gui_shared.get_cell_locations(img_file, index = i, 
                                               intensity_threshold = intensity_threshold, size_threshold = size_threshold,
-                                              bg_threshold = bg_thresh, min_size = min_size, area_threshold = area_thresh, dilation_iter = dilation_iter)
+                                              bg_threshold = bg_thresh, min_size = min_size, area_threshold = area_thresh, dilation_iter = dilation_iter, min_distance=min_dist)
             if c.size:
                 cells.append(c)
             #break
